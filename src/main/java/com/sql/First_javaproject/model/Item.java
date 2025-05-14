@@ -11,7 +11,7 @@ public class Item {
     private String item_uuid;
     public double item_subtotal;
 
-    // Getters and Setters
+   
 
     public String getItem() {
         return item;

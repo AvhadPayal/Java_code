@@ -1,38 +1,53 @@
 package com.sql.First_javaproject.service;
 
-
-
+import com.sql.First_javaproject.model.Item;
 import com.sql.First_javaproject.model.Transaction;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.*;
 
 public class TransactionService {
-    private final ObjectMapper mapper = new ObjectMapper();
 
-    // Read the discount configuration 
-    public Map<String, Double> readDiscountConfig(String filePath) throws Exception {
-        return mapper.readValue(new File(filePath), new TypeReference<Map<String, Double>>() {});
+    // read transaction from json file
+    public List<Transaction> readTransactions(String filePath) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Transaction> transactions = new ArrayList<>();
+        try {
+            transactions = mapper.readValue(new File(filePath), new TypeReference<List<Transaction>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return transactions;
     }
 
-    // Read the list of transactions
-    public List<Transaction> readTransactions(String filePath) throws Exception {
-        return mapper.readValue(new File(filePath), new TypeReference<List<Transaction>>() {});
+    // read discount from json file
+    public Map<String, Double> readDiscounts(String filePath) {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Double> discounts = null;
+        try {
+            discounts = mapper.readValue(new File(filePath), new TypeReference<Map<String, Double>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return discounts;
     }
 
-    // Write the transactions
-    public void writeTransactions(String filePath, List<Transaction> transactions) throws Exception {
-        mapper.writerWithDefaultPrettyPrinter().writeValue(Paths.get(filePath).toFile(), transactions);
-    }
-
+    // validate and calculate 
     public void processTransactions(List<Transaction> allTxns, Map<String, Double> discounts,
-            List<Transaction> valid, List<Transaction> invalid) {
+                                    List<Transaction> valid, List<Transaction> invalid) {
+
         for (Transaction txn : allTxns) {
-            // Validate the transaction and categorize it as valid or invalid
-            if (isDiscountValid(txn, discounts) && isDeliveryValid(txn)) {
+
+            
+            calculateTransactionFields(txn, discounts);
+
+            
+            if (ValidationUtil.isDiscountValid(txn, discounts) &&
+                ValidationUtil.isDeliveryValid(txn)) {
                 valid.add(txn);
             } else {
                 invalid.add(txn);
@@ -40,16 +55,34 @@ public class TransactionService {
         }
     }
 
-    // Validation function for checking if the discount applied is valid
-    private boolean isDiscountValid(Transaction txn, Map<String, Double> discounts) {
-        double totalDiscount = txn.getTotal_discount_applied();
-        return totalDiscount <= txn.getTotal_before_discount();  // Discount shouldn't exceed total before discount
+    // totals, discounts, final amount
+    public void calculateTransactionFields(Transaction txn, Map<String, Double> discounts) {
+        double totalBefore = 0.0;
+        double totalDiscount = 0.0;
+
+        for (Item item : txn.getItems()) {
+            double subtotal = item.getPrice() * item.getQuantity();
+            item.setItem_subtotal(subtotal);
+
+            totalBefore += subtotal;
+
+            double discountRate = discounts.getOrDefault(item.getCategory(), 0.0);
+            totalDiscount += subtotal * discountRate;
+        }
+
+        txn.setTotal_before_discount(totalBefore);
+        txn.setTotal_discount_applied(totalDiscount);
+        txn.setFinal_amount_payable(totalBefore - totalDiscount);
     }
 
-    // Validation function to check if the delivery is valid (optional logic, can be customized)
-    private boolean isDeliveryValid(Transaction txn) {
-        // Example: Checking if the shipping status is 'Shipped' and delivery estimate exists
-        return txn.getShipping() != null && "Shipped".equalsIgnoreCase(txn.getShipping().getStatus()) &&
-                txn.getShipping().getDelivery_estimate() != null;
+    // write o/p into JSON
+    public void writeTransactionsToFile(List<Transaction> transactions, String filename) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(filename), transactions);
+            System.out.println("Written to file: " + filename);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

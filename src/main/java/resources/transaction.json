@@ -1,0 +1,35 @@
+[ {
+  "transaction_id" : "TXN0000001",
+  "timestamp" : "2025-02-25T20:28:46Z",
+  "user_id" : "U42249",
+  "item" : [ {
+    "price" : 25.0,
+    "quantity" : 2,
+    "category" : "Accessories",
+    "item_uuid" : "39126478-46fd-4934-94d4-0f590b0dacd0",
+    "item_subtotal" : 50.0,
+    "item" : "Mouse"
+  } ],
+  "total_before_discount" : 50.0,
+  "total_discount_applied" : 2.5,
+  "final_amount_payable" : 47.5,
+  "payment" : {
+    "amount" : 45.0,
+    "currency" : "USD",
+    "method" : "Credit Card"
+  },
+  "location" : "USA",
+  "shipping" : {
+    "carrier" : "FedEx",
+    "status" : "Shipped",
+    "delivery_estimate" : "2025-03-03"
+  },
+  "items" : [ {
+    "price" : 25.0,
+    "quantity" : 2,
+    "category" : "Accessories",
+    "item_uuid" : "39126478-46fd-4934-94d4-0f590b0dacd0",
+    "item_subtotal" : 50.0,
+    "item" : "Mouse"
+  } ]
+} ]

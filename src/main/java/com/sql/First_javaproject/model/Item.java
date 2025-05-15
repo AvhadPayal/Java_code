@@ -1,27 +1,30 @@
 package com.sql.First_javaproject.model;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Item {
 
-    private String item;
-    private double price;
-    private int quantity;
+	@JsonProperty("item")
+    private String name;
+    public double price;
+    public int quantity;
     public String category;
     private String item_uuid;
-    public double item_subtotal;
+    private double item_subtotal;
 
    
 
-    public String getItem() {
-        return item;
-    }
+    
 
-    public void setItem(String item) {
-        this.item = item;
-    }
+    public String getName() {
+		return name;
+	}
 
-    public double getPrice() {
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public double getPrice() {
         return price;
     }
 

@@ -6,39 +6,36 @@ import com.sql.First_javaproject.service.TransactionService;
 import java.util.*;
 
 public class App {
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        
-        TransactionService service = new TransactionService();
+		TransactionService service = new TransactionService();
 
-        
-        String inputPath = "src/main/java/resources/data.json";
-        String discountPath = "src/main/java/resources/discount_config.json";
-        String validOutputPath = "src/main/java/resources/transaction.json";
-        String invalidOutputPath = "src/main/java/resources/Invalid.json";
+		String inputPath = "src/main/java/resources/data.json";
+		String discountPath = "src/main/java/resources/discount.json";
+		String validOutputPath = "src/main/java/resources/transaction.json";
+		String invalidOutputPath = "src/main/java/resources/Invalid.json";
 
-        try {
-            // Read trasaction
-            List<Transaction> transactions = service.readTransactions(inputPath);
+		try {
+			// Read trasaction
+			List<Transaction> transactions = service.readTransactions(validOutputPath);
 
-            Map<String, Double> discountConfig = service.readDiscounts(discountPath);
+			Map<String, Double> discountConfig = service.readDiscounts(discountPath);
 
-            List<Transaction> validList = new ArrayList<>();
-            List<Transaction> invalidList = new ArrayList<>();
+			List<Transaction> validList = new ArrayList<>();
+			List<Transaction> invalidList = new ArrayList<>();
 
-            // Process transactions
-            service.processTransactions(transactions, discountConfig, validList, invalidList);
+			// Process transactions
+			service.processTransactions(transactions, discountConfig, validList, invalidList);
 
-            // Write valid and invalid transaction
-            service.writeTransactionsToFile(validList, validOutputPath);
-            service.writeTransactionsToFile(invalidList, invalidOutputPath);
+			// Write valid and invalid transactio
+			service.writeTransactionsToFile(validList, validOutputPath);
+			service.writeTransactionsToFile(invalidList, invalidOutputPath);
 
-            
-            System.out.println("Valid transactions: " + validList.size() + ", Invalid: " + invalidList.size());
+			System.out.println("Valid transactions: " + validList.size() + ", Invalid: " + invalidList.size());
 
-        } catch (Exception e) {
-            
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+	}
 }

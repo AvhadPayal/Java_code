@@ -1,18 +1,19 @@
 package com.sql.First_javaproject.service;
 
-import com.sql.First_javaproject.model.Item;
-import com.sql.First_javaproject.model.Transaction;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sql.First_javaproject.model.Item;
+import com.sql.First_javaproject.model.Transaction;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 public class TransactionService {
 
-    // read transaction from json file
+    // ✅ 1. Read transaction.json as List<Transaction>
     public List<Transaction> readTransactions(String filePath) {
         ObjectMapper mapper = new ObjectMapper();
         List<Transaction> transactions = new ArrayList<>();
@@ -24,10 +25,22 @@ public class TransactionService {
         return transactions;
     }
 
-    // read discount from json file
+    // ✅ 2. Read data.json as List<Item>
+    public List<Item> readItems(String filePath) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<Item> items = new ArrayList<>();
+        try {
+            items = mapper.readValue(new File(filePath), new TypeReference<List<Item>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
+
+    // ✅ 3. Read discount configuration file
     public Map<String, Double> readDiscounts(String filePath) {
         ObjectMapper mapper = new ObjectMapper();
-        Map<String, Double> discounts = null;
+        Map<String, Double> discounts = new HashMap<>();
         try {
             discounts = mapper.readValue(new File(filePath), new TypeReference<Map<String, Double>>() {});
         } catch (Exception e) {
@@ -36,16 +49,13 @@ public class TransactionService {
         return discounts;
     }
 
-    // validate and calculate 
+    // ✅ 4. Validate and separate valid/invalid transactions
     public void processTransactions(List<Transaction> allTxns, Map<String, Double> discounts,
                                     List<Transaction> valid, List<Transaction> invalid) {
 
         for (Transaction txn : allTxns) {
-
-            
             calculateTransactionFields(txn, discounts);
 
-            
             if (ValidationUtil.isDiscountValid(txn, discounts) &&
                 ValidationUtil.isDeliveryValid(txn)) {
                 valid.add(txn);
@@ -55,7 +65,7 @@ public class TransactionService {
         }
     }
 
-    // totals, discounts, final amount
+    // ✅ 5. Calculate totals, discounts, and final payable
     public void calculateTransactionFields(Transaction txn, Map<String, Double> discounts) {
         double totalBefore = 0.0;
         double totalDiscount = 0.0;
@@ -75,7 +85,7 @@ public class TransactionService {
         txn.setFinal_amount_payable(totalBefore - totalDiscount);
     }
 
-    // write o/p into JSON
+    // ✅ 6. Write transactions to output JSON
     public void writeTransactionsToFile(List<Transaction> transactions, String filename) {
         ObjectMapper mapper = new ObjectMapper();
         try {
